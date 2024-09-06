@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: omg-back
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/omg
+    username:
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging.level:
+  org.hibernate.SQL: debug
