@@ -24,8 +24,10 @@ public interface RoomService {
     // 시작 버튼 클릭
     CommonRoomResponse clickStartButton(CommonRoomRequest request) throws BaseException;
 
-    // 모든 사용자 렌더 완료 여부
+    // 사용자 렌더 완료
     CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException;
 
-    //
+    // 모든 사용자 렌더 완료 여부
+    boolean checkAllRenderedCompleted(String gameId) throws BaseException;
+
 }

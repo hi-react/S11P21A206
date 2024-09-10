@@ -207,4 +207,44 @@ public class RoomServiceImpl implements RoomService {
         return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, null);
     }
 
+    /**
+     * 사용자 렌더 완료
+     *
+     * @param request
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException {
+        String roomKey = ROOM_PREFIX + request.getRoomId();
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        roomInfo.setRenderedCount(roomInfo.getRenderedCount() + 1);
+        redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
+
+        GameInfo gameInfo = gameService.getGameInfo(gameId);
+        if (gameInfo == null) {
+            throw new BaseException(GAME_NOT_FOUND);
+        }
+
+        return new CommonRoomResponse(gameId, "RENDER_COMPLETE_ACCEPTED", gameInfo, null);
+    }
+
+    /**
+     * 모든 사용자 렌더 완료 여부
+     *
+     * @param gameId
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public boolean checkAllRenderedCompleted(String gameId) throws BaseException {
+        return false;
+    }
+
+
 }
