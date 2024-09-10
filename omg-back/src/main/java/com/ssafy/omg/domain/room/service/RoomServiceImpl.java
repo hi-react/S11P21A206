@@ -138,11 +138,24 @@ public class RoomServiceImpl implements RoomService {
         String roomId = request.getRoomId();
         String sender = request.getSender();
 
+        // 입력값 오류
+        if (roomId == null || roomId.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+        if (sender == null || sender.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
 
         // 대기방 존재하지 않을 경우 예외처리
         if (roomInfo == null) {
             throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        // 대기방에 존재하지 않는 사람일 경우 예외처리
+        if (!roomInfo.getInRoomPlayers().contains(sender)) {
+            throw new BaseException(USER_NOT_IN_ROOM);
         }
 
         roomInfo.getInRoomPlayers().remove(sender);
@@ -160,6 +173,7 @@ public class RoomServiceImpl implements RoomService {
 
     /**
      * 시작 버튼 활성화 여부
+     * 방장이면서 4명이 꽉 찼을 때 game start 버튼 활성화
      *
      * @param request
      * @return
@@ -167,13 +181,15 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public boolean isStartButtonActive(CommonRoomRequest request) throws BaseException {
         String roomKey = ROOM_PREFIX + request.getRoomId();
-        String roomId = request.getRoomId();
+        String sender = request.getSender();
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
 
         if (roomInfo == null) {
             throw new BaseException(ROOM_NOT_FOUND);
         }
-        return roomInfo.getInRoomPlayers().size() == 4;
+
+        boolean isHost = roomInfo.getHost().getNickname().equals(sender);
+        return isHost && roomInfo.getInRoomPlayers().size() == 4;
     }
 
     /**
@@ -185,7 +201,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public CommonRoomResponse clickStartButton(CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
-        if (isStartButtonActive(request)) {
+        if (!isStartButtonActive(request)) {
             throw new BaseException(INSUFFICIENT_PLAYER_ERROR);
         }
         return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, null);
