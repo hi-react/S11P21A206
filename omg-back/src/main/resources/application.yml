@@ -8,5 +8,19 @@ spring:
     password: ${DB_PASSWORD_LOCAL}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  #        default_batch_fetch_size: 100
+
+  # Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
 logging.level:
   org.hibernate.SQL: debug

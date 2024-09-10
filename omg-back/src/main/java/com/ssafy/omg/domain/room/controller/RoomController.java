@@ -1,0 +1,82 @@
+package com.ssafy.omg.domain.room.controller;
+
+import com.ssafy.omg.config.baseresponse.BaseException;
+import com.ssafy.omg.config.baseresponse.BaseResponse;
+import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
+import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
+import com.ssafy.omg.domain.room.service.RoomService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/rooms")
+@RequiredArgsConstructor
+public class RoomController {
+
+    private final RoomService roomService;
+
+    // TODO
+    // User 정보 AccessToken에서 HttpServletRequest로부터 getAttribute해서 userNickname 가져올 것.
+    // 임시로 닉네임 부여해서 테스트 진행
+
+    /**
+     * 대기방 생성
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/create")
+    public BaseResponse<String> createRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        String roomId = roomService.createRoom(request);
+        return new BaseResponse<>(roomId);
+    }
+
+    /**
+     * 대기방 입장
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/enter")
+    public BaseResponse<CommonRoomResponse> enterRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.enterRoom(request);
+        return new BaseResponse<>(response);
+    }
+
+    /**
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/leave")
+    public BaseResponse<CommonRoomResponse> leaveRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.leaveRoom(request);
+        return new BaseResponse<>(response);
+    }
+
+    /**
+     * 게임 시작 버튼 활성화
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @GetMapping("")
+    public BaseResponse<Boolean> isStartButtonActive(@RequestBody CommonRoomRequest request) throws BaseException {
+        boolean isButtonActive = roomService.isStartButtonActive(request);
+        return new BaseResponse<>(isButtonActive);
+    }
+
+    /**
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/start")
+    public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.clickStartButton(request);
+        return new BaseResponse<>(response);
+    }
+}
