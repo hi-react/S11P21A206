@@ -1,4 +1,4 @@
-package com.ssafy.omg.domain.game;
+package com.ssafy.omg.domain.game.service;
 
 import com.ssafy.omg.domain.game.dto.GameInfo;
 import com.ssafy.omg.domain.game.dto.PlayerInfo;

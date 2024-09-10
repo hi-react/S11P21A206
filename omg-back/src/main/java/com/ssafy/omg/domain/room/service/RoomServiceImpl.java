@@ -1,7 +1,7 @@
 package com.ssafy.omg.domain.room.service;
 
 import com.ssafy.omg.config.baseresponse.BaseException;
-import com.ssafy.omg.domain.game.GameService;
+import com.ssafy.omg.domain.game.service.GameService;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.dto.HostInfo;
