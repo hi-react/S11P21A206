@@ -1,6 +1,7 @@
 package com.ssafy.omg.domain.room.service;
 
 import com.ssafy.omg.config.baseresponse.BaseException;
+import com.ssafy.omg.domain.game.dto.GameInfo;
 import com.ssafy.omg.domain.game.service.GameService;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
@@ -204,7 +205,8 @@ public class RoomServiceImpl implements RoomService {
         if (!isStartButtonActive(request)) {
             throw new BaseException(INSUFFICIENT_PLAYER_ERROR);
         }
-        return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, null);
+        RoomInfo roomInfo = getRoomInfo(roomId);
+        return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, roomInfo);
     }
 
     /**
@@ -217,34 +219,64 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException {
         String roomKey = ROOM_PREFIX + request.getRoomId();
+        String roomId = request.getRoomId();
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
 
         if (roomInfo == null) {
             throw new BaseException(ROOM_NOT_FOUND);
         }
 
-        roomInfo.setRenderedCount(roomInfo.getRenderedCount() + 1);
+        roomInfo.setIsRendered(roomInfo.getIsRendered() + 1);
         redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
 
-        GameInfo gameInfo = gameService.getGameInfo(gameId);
-        if (gameInfo == null) {
-            throw new BaseException(GAME_NOT_FOUND);
-        }
+        //Todo 게임서비스 구현
+//        GameInfo gameInfo = gameService.getGameInfo(roomId);
+//        if (gameInfo == null) {
+//            throw new BaseException(GAME_NOT_FOUND);
+//        }
 
-        return new CommonRoomResponse(gameId, "RENDER_COMPLETE_ACCEPTED", gameInfo, null);
+        return new CommonRoomResponse(roomId, "RENDER_COMPLETE_ACCEPTED", null, null);
     }
 
     /**
      * 모든 사용자 렌더 완료 여부
      *
-     * @param gameId
+     * @param request
      * @return
      * @throws BaseException
      */
     @Override
-    public boolean checkAllRenderedCompleted(String gameId) throws BaseException {
-        return false;
+    public CommonRoomResponse checkAllRenderedCompleted(CommonRoomRequest request) throws BaseException {
+        String roomKey = ROOM_PREFIX + request.getRoomId();
+        String roodId = request.getRoomId();
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        if (roomInfo.getIsRendered() == roomInfo.getInRoomPlayers().size()) {
+            return new CommonRoomResponse(roodId, "ALL_RENDERED_COMPLETED", null, roomInfo);
+        }else{
+            throw new BaseException(RENDER_NOT_COMPLETED);
+        }
     }
 
+    /**
+     * 방 정보 반환
+     * 
+     * @param roomId
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public RoomInfo getRoomInfo(String roomId) throws BaseException {
+        String roomKey = ROOM_PREFIX + roomId;
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+        return roomInfo;
+    }
 
 }
