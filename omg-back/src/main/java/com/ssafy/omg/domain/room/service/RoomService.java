@@ -1,18 +1,27 @@
 package com.ssafy.omg.domain.room.service;
 
+import com.ssafy.omg.config.baseresponse.BaseException;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 
 public interface RoomService {
+
+    // 고유 대기 방 ID 생성
+    String createRoomId() throws BaseException;
+
+    // 대기 방 생성
+    String createRoom(CommonRoomRequest request) throws BaseException;
+
     // 대기 방 입장
-    CommonRoomResponse enterRoom(CommonRoomRequest request);
+    CommonRoomResponse enterRoom(CommonRoomRequest request) throws BaseException;
 
     // 대기 방 나가기
-    CommonRoomResponse leaveRoom(CommonRoomRequest request);
+    CommonRoomResponse leaveRoom(CommonRoomRequest request) throws BaseException;
+
+    // 시작 버튼 활성화 여부
+    boolean isStartButtonActive(CommonRoomRequest request) throws BaseException;
 
     // 시작 버튼 클릭
-    CommonRoomResponse startButtonClicked(CommonRoomRequest request);
+    CommonRoomResponse clickStartButton(CommonRoomRequest request) throws BaseException;
 
-    // 플레이어 렌더링 완료
-    CommonRoomResponse renderedComplete(CommonRoomRequest request);
 }

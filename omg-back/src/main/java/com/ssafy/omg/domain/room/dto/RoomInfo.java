@@ -1,18 +1,18 @@
 package com.ssafy.omg.domain.room.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Builder
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomInfo {
-    private String gameId;
+    private String roomId;
     private HostInfo host;
     private List<String> inRoomPlayers;
     private int isRendered;

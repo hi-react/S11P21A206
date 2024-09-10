@@ -1,45 +1,82 @@
 package com.ssafy.omg.domain.room.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-
+import com.ssafy.omg.config.baseresponse.BaseException;
+import com.ssafy.omg.config.baseresponse.BaseResponse;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.service.RoomService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
+@RequestMapping("/rooms")
+@RequiredArgsConstructor
 public class RoomController {
 
     private final RoomService roomService;
 
-    @Autowired
-    public RoomController(RoomService roomService) {
-        this.roomService = roomService;
+    // TODO
+    // User 정보 AccessToken에서 HttpServletRequest로부터 getAttribute해서 userNickname 가져올 것.
+    // 임시로 닉네임 부여해서 테스트 진행
+
+    /**
+     * 대기방 생성
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/create")
+    public BaseResponse<String> createRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        String roomId = roomService.createRoom(request);
+        return new BaseResponse<>(roomId);
     }
 
-    @MessageMapping("/room/enter")
-    @SendTo("/pub/room")
-    public CommonRoomResponse enterRoom(CommonRoomRequest request) {
-        return roomService.enterRoom(request);
+    /**
+     * 대기방 입장
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/enter")
+    public BaseResponse<CommonRoomResponse> enterRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.enterRoom(request);
+        return new BaseResponse<>(response);
     }
 
-    @MessageMapping("/room/leave")
-    @SendTo("/pub/room")
-    public CommonRoomResponse leaveRoom(CommonRoomRequest request) {
-        return roomService.leaveRoom(request);
+    /**
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/leave")
+    public BaseResponse<CommonRoomResponse> leaveRoom(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.leaveRoom(request);
+        return new BaseResponse<>(response);
     }
 
-    @MessageMapping("/room/start")
-    @SendTo("/pub/room")
-    public CommonRoomResponse startButtonClicked(CommonRoomRequest request) {
-        return roomService.startButtonClicked(request);
+    /**
+     * 게임 시작 버튼 활성화
+     *
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @GetMapping("")
+    public BaseResponse<Boolean> isStartButtonActive(@RequestBody CommonRoomRequest request) throws BaseException {
+        boolean isButtonActive = roomService.isStartButtonActive(request);
+        return new BaseResponse<>(isButtonActive);
     }
 
-    @MessageMapping("/room/rendered")
-    @SendTo("/pub/room")
-    public CommonRoomResponse renderedComplete(CommonRoomRequest request) {
-        return roomService.renderedComplete(request);
+    /**
+     * @param request
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/start")
+    public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.clickStartButton(request);
+        return new BaseResponse<>(response);
     }
 }
