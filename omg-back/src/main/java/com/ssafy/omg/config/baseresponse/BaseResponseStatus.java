@@ -49,6 +49,7 @@ public enum BaseResponseStatus {
     INSUFFICIENT_PLAYER_ERROR(false, 3024, "게임 시작에 필요한 플레이어 수가 충분하지 않습니다."),
     ALREADY_ENTERED_ERROR(false, 3025, "이미 게임 대기방에 참여중입니다."),
     USER_NOT_IN_ROOM(false, 3026, "대기방에서 유저를 찾을 수 없습니다."),
+    RENDER_NOT_COMPLETED(false, 3027, "모든 유저의 렌더가 완료되지 않았습니다."),
 
     // 3101 ~~ 3199 : 이가은
 
