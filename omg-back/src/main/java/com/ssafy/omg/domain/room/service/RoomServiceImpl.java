@@ -1,7 +1,7 @@
 package com.ssafy.omg.domain.room.service;
 
 import com.ssafy.omg.config.baseresponse.BaseException;
-import com.ssafy.omg.domain.game.GameService;
+import com.ssafy.omg.domain.game.service.GameService;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.dto.HostInfo;
@@ -55,23 +55,26 @@ public class RoomServiceImpl implements RoomService {
     /**
      * 대기 방 생성
      *
-     * @param request
+     * @param userNickname
      * @return
      */
     @Override
-    public String createRoom(CommonRoomRequest request) throws BaseException {
+    public String createRoom(String userNickname) throws BaseException {
         try {
             String roomId = createRoomId();
             String roomKey = ROOM_PREFIX + roomId;
+            System.out.println("방 아이디 : " + roomId);
 
-            RoomInfo roomInfo = new RoomInfo(roomId, new HostInfo(request.getSender()), new ArrayList<>(), 0);
-            roomInfo.getInRoomPlayers().add(request.getSender());
+            RoomInfo roomInfo = new RoomInfo(roomId, new HostInfo(userNickname), new ArrayList<>(), 0);
+            roomInfo.getInRoomPlayers().add(userNickname);
+            System.out.println("RoomInfo : " + roomInfo);
 
             // Redis에 대기방 정보 저장
             redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
 
             return roomId;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BaseException(ROOM_CREATION_ERROR);
         }
     }
@@ -89,6 +92,15 @@ public class RoomServiceImpl implements RoomService {
         String roomKey = ROOM_PREFIX + request.getRoomId();
         String roomId = request.getRoomId();
         String sender = request.getSender();
+        String message = request.getMessage();
+
+        // 입력값 오류
+        if (roomId == null || roomId.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+        if (sender == null || sender.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
 
         // 대기방 존재하지 않을 경우 예외처리
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
@@ -101,9 +113,12 @@ public class RoomServiceImpl implements RoomService {
             throw new BaseException(ROOM_FULLED_ERROR);
         }
 
-        if (!roomInfo.getInRoomPlayers().contains(sender)) {
+        boolean isNewPlayer = !roomInfo.getInRoomPlayers().contains(sender);
+        if (isNewPlayer) {
             roomInfo.getInRoomPlayers().add(sender);
             redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
+        } else {
+            throw new BaseException(ALREADY_ENTERED_ERROR);
         }
 
         return new CommonRoomResponse(roomId, "ENTER_SUCSESS", null, roomInfo);

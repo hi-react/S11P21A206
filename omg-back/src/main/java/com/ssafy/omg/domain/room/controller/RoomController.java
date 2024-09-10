@@ -22,13 +22,14 @@ public class RoomController {
     /**
      * 대기방 생성
      *
-     * @param request
+     * @param userNickname
      * @return response
      * @throws BaseException
      */
     @PostMapping("/create")
-    public BaseResponse<String> createRoom(@RequestBody CommonRoomRequest request) throws BaseException {
-        String roomId = roomService.createRoom(request);
+    public BaseResponse<String> createRoom(@RequestParam String userNickname) throws BaseException {
+        userNickname = "test1";
+        String roomId = roomService.createRoom(userNickname);
         return new BaseResponse<>(roomId);
     }
 

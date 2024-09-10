@@ -10,7 +10,7 @@ public interface RoomService {
     String createRoomId() throws BaseException;
 
     // 대기 방 생성
-    String createRoom(CommonRoomRequest request) throws BaseException;
+    String createRoom(String userNickname) throws BaseException;
 
     // 대기 방 입장
     CommonRoomResponse enterRoom(CommonRoomRequest request) throws BaseException;

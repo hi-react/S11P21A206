@@ -47,6 +47,7 @@ public enum BaseResponseStatus {
     ROOM_NOT_FOUND(false, 3022, "게임 대기방이 존재하지 않습니다."),
     ROOM_FULLED_ERROR(false, 3023, "게임 대기방이 존재하지 않습니다."),
     INSUFFICIENT_PLAYER_ERROR(false, 3024, "게임 시작에 필요한 플레이어 수가 충분하지 않습니다."),
+    ALREADY_ENTERED_ERROR(false, 3025, "이미 게임 대기방에 참여중입니다."),
 
     // 3101 ~~ 3199 : 이가은
 
