@@ -11,7 +11,7 @@ pipeline {
             steps {
                 // GitLab에서 코드를 체크아웃
                 git branch: 'develop',
-                credentialsId: 'junsk50@naver.com',
+                credentialsId: 'junsk50',
                 url: 'https://lab.ssafy.com/s11-fintech-finance-sub1/S11P21A206.git'
             }
         }
