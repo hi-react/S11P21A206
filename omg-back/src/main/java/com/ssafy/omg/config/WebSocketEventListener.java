@@ -4,7 +4,6 @@ import com.ssafy.omg.config.baseresponse.BaseException;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.service.RoomService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -36,7 +35,10 @@ public class WebSocketEventListener {
         String userNickname = (String) headerAccessor.getSessionAttributes().get("userNickname");
         String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
 
-        if(userNickname != null && roomId != null) {
+        logger.info("연결 해제 : " + userNickname);
+
+
+        if (userNickname != null && roomId != null) {
             logger.info("연결 해제 : " + userNickname);
 
             try {
