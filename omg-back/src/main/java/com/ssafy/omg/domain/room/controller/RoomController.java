@@ -6,6 +6,8 @@ import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.reactor.ReactorProperties;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
 
     private final RoomService roomService;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final ReactorProperties reactorProperties;
 
     // TODO
     // User 정보 AccessToken에서 HttpServletRequest로부터 getAttribute해서 userNickname 가져올 것.
@@ -22,13 +26,14 @@ public class RoomController {
     /**
      * 대기방 생성
      *
-     * @param request
+     * @param userNickname
      * @return response
      * @throws BaseException
      */
     @PostMapping("/create")
-    public BaseResponse<String> createRoom(@RequestBody CommonRoomRequest request) throws BaseException {
-        String roomId = roomService.createRoom(request);
+    public BaseResponse<String> createRoom(@RequestParam String userNickname) throws BaseException {
+        userNickname = "test1";
+        String roomId = roomService.createRoom(userNickname);
         return new BaseResponse<>(roomId);
     }
 
@@ -77,6 +82,8 @@ public class RoomController {
     @PostMapping("/start")
     public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
         CommonRoomResponse response = roomService.clickStartButton(request);
+        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId(),
+                new CommonRoomResponse(request.getRoomId(), "GAME_START", null, response.getRoomInfo()));
         return new BaseResponse<>(response);
     }
 }

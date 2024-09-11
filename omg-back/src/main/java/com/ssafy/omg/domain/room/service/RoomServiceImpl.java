@@ -1,6 +1,7 @@
 package com.ssafy.omg.domain.room.service;
 
 import com.ssafy.omg.config.baseresponse.BaseException;
+import com.ssafy.omg.domain.game.dto.GameInfo;
 import com.ssafy.omg.domain.game.service.GameService;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
@@ -55,23 +56,26 @@ public class RoomServiceImpl implements RoomService {
     /**
      * 대기 방 생성
      *
-     * @param request
+     * @param userNickname
      * @return
      */
     @Override
-    public String createRoom(CommonRoomRequest request) throws BaseException {
+    public String createRoom(String userNickname) throws BaseException {
         try {
             String roomId = createRoomId();
             String roomKey = ROOM_PREFIX + roomId;
+            System.out.println("방 아이디 : " + roomId);
 
-            RoomInfo roomInfo = new RoomInfo(roomId, new HostInfo(request.getSender()), new ArrayList<>(), 0);
-            roomInfo.getInRoomPlayers().add(request.getSender());
+            RoomInfo roomInfo = new RoomInfo(roomId, new HostInfo(userNickname), new ArrayList<>(), 0);
+            roomInfo.getInRoomPlayers().add(userNickname);
+            System.out.println("RoomInfo : " + roomInfo);
 
             // Redis에 대기방 정보 저장
             redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
 
             return roomId;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BaseException(ROOM_CREATION_ERROR);
         }
     }
@@ -89,6 +93,15 @@ public class RoomServiceImpl implements RoomService {
         String roomKey = ROOM_PREFIX + request.getRoomId();
         String roomId = request.getRoomId();
         String sender = request.getSender();
+        String message = request.getMessage();
+
+        // 입력값 오류
+        if (roomId == null || roomId.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+        if (sender == null || sender.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
 
         // 대기방 존재하지 않을 경우 예외처리
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
@@ -101,9 +114,12 @@ public class RoomServiceImpl implements RoomService {
             throw new BaseException(ROOM_FULLED_ERROR);
         }
 
-        if (!roomInfo.getInRoomPlayers().contains(sender)) {
+        boolean isNewPlayer = !roomInfo.getInRoomPlayers().contains(sender);
+        if (isNewPlayer) {
             roomInfo.getInRoomPlayers().add(sender);
             redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
+        } else {
+            throw new BaseException(ALREADY_ENTERED_ERROR);
         }
 
         return new CommonRoomResponse(roomId, "ENTER_SUCSESS", null, roomInfo);
@@ -123,11 +139,24 @@ public class RoomServiceImpl implements RoomService {
         String roomId = request.getRoomId();
         String sender = request.getSender();
 
+        // 입력값 오류
+        if (roomId == null || roomId.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+        if (sender == null || sender.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        }
+
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
 
         // 대기방 존재하지 않을 경우 예외처리
         if (roomInfo == null) {
             throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        // 대기방에 존재하지 않는 사람일 경우 예외처리
+        if (!roomInfo.getInRoomPlayers().contains(sender)) {
+            throw new BaseException(USER_NOT_IN_ROOM);
         }
 
         roomInfo.getInRoomPlayers().remove(sender);
@@ -145,6 +174,7 @@ public class RoomServiceImpl implements RoomService {
 
     /**
      * 시작 버튼 활성화 여부
+     * 방장이면서 4명이 꽉 찼을 때 game start 버튼 활성화
      *
      * @param request
      * @return
@@ -152,13 +182,15 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public boolean isStartButtonActive(CommonRoomRequest request) throws BaseException {
         String roomKey = ROOM_PREFIX + request.getRoomId();
-        String roomId = request.getRoomId();
+        String sender = request.getSender();
         RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
 
         if (roomInfo == null) {
             throw new BaseException(ROOM_NOT_FOUND);
         }
-        return roomInfo.getInRoomPlayers().size() == 4;
+
+        boolean isHost = roomInfo.getHost().getNickname().equals(sender);
+        return isHost && roomInfo.getInRoomPlayers().size() == 4;
     }
 
     /**
@@ -170,10 +202,81 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public CommonRoomResponse clickStartButton(CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
-        if (isStartButtonActive(request)) {
+        if (!isStartButtonActive(request)) {
             throw new BaseException(INSUFFICIENT_PLAYER_ERROR);
         }
-        return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, null);
+        RoomInfo roomInfo = getRoomInfo(roomId);
+        return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, roomInfo);
+    }
+
+    /**
+     * 사용자 렌더 완료
+     *
+     * @param request
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException {
+        String roomKey = ROOM_PREFIX + request.getRoomId();
+        String roomId = request.getRoomId();
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        roomInfo.setIsRendered(roomInfo.getIsRendered() + 1);
+        redisTemplate.opsForValue().set(roomKey, roomInfo, 1, TimeUnit.HOURS);
+
+        //Todo 게임서비스 구현
+//        GameInfo gameInfo = gameService.getGameInfo(roomId);
+//        if (gameInfo == null) {
+//            throw new BaseException(GAME_NOT_FOUND);
+//        }
+
+        return new CommonRoomResponse(roomId, "RENDER_COMPLETE_ACCEPTED", null, null);
+    }
+
+    /**
+     * 모든 사용자 렌더 완료 여부
+     *
+     * @param request
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public CommonRoomResponse checkAllRenderedCompleted(CommonRoomRequest request) throws BaseException {
+        String roomKey = ROOM_PREFIX + request.getRoomId();
+        String roodId = request.getRoomId();
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+
+        if (roomInfo.getIsRendered() == roomInfo.getInRoomPlayers().size()) {
+            return new CommonRoomResponse(roodId, "ALL_RENDERED_COMPLETED", null, roomInfo);
+        }else{
+            throw new BaseException(RENDER_NOT_COMPLETED);
+        }
+    }
+
+    /**
+     * 방 정보 반환
+     * 
+     * @param roomId
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public RoomInfo getRoomInfo(String roomId) throws BaseException {
+        String roomKey = ROOM_PREFIX + roomId;
+        RoomInfo roomInfo = redisTemplate.opsForValue().get(roomKey);
+        if (roomInfo == null) {
+            throw new BaseException(ROOM_NOT_FOUND);
+        }
+        return roomInfo;
     }
 
 }
