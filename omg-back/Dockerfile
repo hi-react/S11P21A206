@@ -1,23 +1,28 @@
-# 1단계: 빌드 단계 (Gradle 빌드를 수행)
-FROM gradle:7.5.1-jdk17 AS build
+# Use Gradle image for building, specify JDK 17 as the target
+FROM gradle:8.0-jdk17 AS build
+
 WORKDIR /app
 
-# Gradle 캐시를 활용하여 종속성 다운로드 속도 향상
-COPY gradle /app/gradle
-COPY build.gradle settings.gradle /app/
-RUN gradle build --no-daemon || return 0
+# Copy build.gradle and settings.gradle for dependency resolution
+COPY build.gradle settings.gradle ./
 
-# 소스 코드 복사 및 빌드 수행
-COPY . .
-RUN gradle bootJar --no-daemon
+# Copy the rest of the application code
+COPY . /app
 
-# 2단계: 실행 단계 (경량화된 JDK로 실행)
+# Build the project and skip the tests (-x test)
+RUN gradle clean build --no-daemon -x test
+
+# Use JRE for runtime environment to keep the image size smaller
 FROM openjdk:17-jdk-slim
+
 WORKDIR /app
 
-# 빌드된 JAR 파일을 복사
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+# Copy the built JAR from the build stage to the runtime stage
+COPY --from=build /app/build/libs/*.jar /app/omg-backend.jar
 
-# 애플리케이션을 실행
+# Expose the necessary port for the backend (8080)
 EXPOSE 8080
-CMD ["java", "-jar", "/app/app.jar"]
+
+# Run the Spring Boot application using the built JAR
+ENTRYPOINT [ "java" ]
+CMD [ "-jar", "omg-backend.jar" ]
