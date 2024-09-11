@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test Page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        input, button { margin: 5px; padding: 5px; }
+        #messageArea { border: 1px solid #ccc; height: 300px; overflow-y: scroll; margin-top: 20px; padding: 10px; }
+    </style>
+</head>
+<body>
+<h1>WebSocket Test Page</h1>
+
+<div>
+    <input type="text" id="nickname" placeholder="Enter your nickname">
+</div>
+
+<div>
+    <button onclick="createRoom()">Create Room</button>
+    <input type="text" id="roomId" placeholder="Enter room ID">
+    <button onclick="joinRoom()">Join Room</button>
+    <button onclick="leaveRoom()">Leave Room</button>
+</div>
+
+<div>
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<div>
+    <input type="text" id="message" placeholder="Enter message">
+    <button onclick="sendMessage()">Send Message</button>
+</div>
+
+<div id="messageArea"></div>
+
+<script>
+    let stompClient = null;
+    let currentRoomId = null;
+    let currentNickname = null;
+
+    function createRoom() {
+        currentNickname = document.getElementById('nickname').value;
+        if (!currentNickname) {
+            alert('Please enter a nickname');
+            return;
+        }
+
+        fetch('/rooms/create?userNickname=' + currentNickname, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                currentRoomId = data.result;
+                showMessage('Room created: ' + currentRoomId);
+                connectToRoom(currentRoomId);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function joinRoom() {
+        currentNickname = document.getElementById('nickname').value;
+        if (!currentNickname) {
+            alert('Please enter a nickname');
+            return;
+        }
+
+        let roomId = document.getElementById('roomId').value;
+        if (!roomId) {
+            alert('Please enter a room ID');
+            return;
+        }
+
+        let request = {
+            roomId: roomId,
+            sender: currentNickname,
+            message: 'JOIN_ROOM'
+        };
+
+        fetch('/rooms/enter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request)
+        })
+            .then(response => response.json())
+            .then(data => {
+                currentRoomId = roomId;
+                showMessage('Joined room: ' + currentRoomId);
+                connectToRoom(currentRoomId);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function leaveRoom() {
+        if (!currentRoomId) {
+            alert('Please join a room first');
+            return;
+        }
+
+        let request = {
+            roomId: currentRoomId,
+            sender: currentNickname,
+            message: 'LEAVE_ROOM'
+        };
+
+        fetch('/rooms/leave', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request)
+        })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Left room: ' + currentRoomId);
+                currentRoomId = null;
+                if (stompClient) {
+                    stompClient.disconnect();
+                    stompClient = null;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function startGame() {
+        if (!currentRoomId) {
+            alert('Please join a room first');
+            return;
+        }
+
+        let request = {
+            roomId: currentRoomId,
+            sender: currentNickname,
+            message: 'START_GAME'
+        };
+
+        fetch('/rooms/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request)
+        })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Game start requested');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error starting game: ' + error.message);
+            });
+    }
+
+    function connectToRoom(roomId) {
+        if (stompClient) {
+            stompClient.disconnect();
+        }
+
+        let socket = new SockJS('/omg');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected to room WebSocket: ' + frame);
+            showMessage('Connected to room WebSocket');
+            stompClient.subscribe('/topic/room/' + roomId, function (response) {
+                let message = JSON.parse(response.body);
+                if (message.message === 'GAME_START') {
+                    showMessage('Game started!');
+                    // 여기에 게임 시작 후 추가 로직을 구현할 수 있습니다.
+                } else {
+                    showMessage('Received: ' + JSON.stringify(message));
+                }
+            });
+        });
+    }
+
+    function sendMessage() {
+        if (!stompClient || !currentRoomId) {
+            alert('Please join a room first');
+            return;
+        }
+
+        let message = document.getElementById('message').value;
+        if (!message) {
+            alert('Please enter a message');
+            return;
+        }
+
+        stompClient.send("/pub/room/" + currentRoomId, {}, JSON.stringify({
+            roomId: currentRoomId,
+            sender: currentNickname,
+            message: message
+        }));
+
+        document.getElementById('message').value = '';
+    }
+
+    function showMessage(message) {
+        let messageArea = document.getElementById('messageArea');
+        let messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+</script>
+</body>
+</html>
