@@ -6,6 +6,10 @@ html {
   @apply h-screen w-full text-gray-800 break-words m-auto;
 }
 
+.modal-open {
+  overflow: hidden;
+}
+
 @font-face {
   font-family: 'OKDDUNG';
   src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKDDUNG.woff2')

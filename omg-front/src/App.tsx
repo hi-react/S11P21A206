@@ -1,6 +1,9 @@
+import Modal from 'react-modal';
 import { Route, Routes } from 'react-router-dom';
 
 import loadable from '@loadable/component';
+
+Modal.setAppElement('#root');
 
 const Login = loadable(() => import('@/pages/Login'), {
   fallback: <div>로그인 로딩중</div>,
