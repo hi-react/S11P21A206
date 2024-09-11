@@ -32,7 +32,7 @@ public class RoomController {
      */
     @PostMapping("/create")
     public BaseResponse<String> createRoom(@RequestParam String userNickname) throws BaseException {
-        userNickname = "test1";
+//        userNickname = "test1";
         String roomId = roomService.createRoom(userNickname);
         return new BaseResponse<>(roomId);
     }
