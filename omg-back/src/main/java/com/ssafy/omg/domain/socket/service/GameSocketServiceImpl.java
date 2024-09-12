@@ -2,7 +2,7 @@ package com.ssafy.omg.domain.socket.service;
 
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
-import com.ssafy.omg.domain.room.entity.Room;
+import com.ssafy.omg.domain.room.entity.RoomInfo;
 import com.ssafy.omg.domain.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class GameSocketServiceImpl {
     // 방 정보 수정
     public void modifyRoom(CommonRoomRequest request) {
         try {
-            Room roomInfo = roomService.getRoomInfo(request.getRoomId());
+            RoomInfo roomInfo = roomService.getRoomInfo(request.getRoomId());
             // 방 정보 수정 로직
             // ...
 
@@ -42,7 +42,7 @@ public class GameSocketServiceImpl {
 
     public void hideStart(String roomId) {
         try {
-            Room roomInfo = roomService.getRoomInfo(roomId);
+            RoomInfo roomInfo = roomService.getRoomInfo(roomId);
             // 숨기 시작 로직
             // ...
 
