@@ -59,6 +59,23 @@
             height: 200px;
             overflow-y: auto;
         }
+
+        /* 채팅 UI 스타일 추가 */
+        #chatBox {
+            border: 1px solid #000;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        #chatInput {
+            width: 80%;
+        }
+
+        #sendButton {
+            width: 18%;
+        }
     </style>
 </head>
 <body>
@@ -97,10 +114,10 @@
     let currentRoomId = null;
     let currentNickname = null;
 
-    function debugLog(message) {
-        console.log(message);
+    function debugLog(message, type = 'INFO') {
+        console.log(`[${type}] ${message}`);
         let debugLog = document.getElementById('debugLog');
-        debugLog.textContent += new Date().toISOString() + ': ' + message + '\n';
+        debugLog.textContent += `${new Date().toISOString()} [${type}]: ${message}\n`;
         debugLog.scrollTop = debugLog.scrollHeight;
     }
 
@@ -111,18 +128,18 @@
             return;
         }
 
-        debugLog('Creating room...');
+        debugLog('Creating room...', 'ROOM');
         fetch('/rooms/create?userNickname=' + encodeURIComponent(currentNickname), {method: 'POST'})
             .then(response => response.json())
             .then(data => {
                 currentRoomId = data.result;
-                debugLog('Room created: ' + currentRoomId);
-                showMessage('System', 'Room created: ' + currentRoomId);
+                debugLog(`Room created: ${currentRoomId}`, 'ROOM');
+                showMessage('System', `Room created: ${currentRoomId}`);
                 connectToRoom(currentRoomId);
             })
             .catch(error => {
                 console.error('Error:', error);
-                debugLog('Error creating room: ' + error);
+                debugLog(`Error creating room: ${error}`, 'ERROR');
             });
     }
 
@@ -139,7 +156,7 @@
             return;
         }
 
-        debugLog('Joining room: ' + roomId);
+        debugLog(`Joining room: ${roomId}`, 'ROOM');
         let request = {
             roomId: roomId,
             sender: currentNickname,
@@ -156,13 +173,13 @@
             .then(response => response.json())
             .then(data => {
                 currentRoomId = roomId;
-                debugLog('Joined room: ' + currentRoomId);
-                showMessage('System', 'Joined room: ' + currentRoomId);
+                debugLog(`Joined room: ${currentRoomId}`, 'ROOM');
+                showMessage('System', `Joined room: ${currentRoomId}`);
                 connectToRoom(currentRoomId);
             })
             .catch(error => {
                 console.error('Error:', error);
-                debugLog('Error joining room: ' + error);
+                debugLog(`Error joining room: ${error}`, 'ERROR');
             });
     }
 
@@ -172,7 +189,7 @@
             return;
         }
 
-        debugLog('Leaving room: ' + currentRoomId);
+        debugLog(`Leaving room: ${currentRoomId}`, 'ROOM');
         let request = {
             roomId: currentRoomId,
             sender: currentNickname,
@@ -188,17 +205,18 @@
         })
             .then(response => response.json())
             .then(data => {
-                debugLog('Left room: ' + currentRoomId);
-                showMessage('System', 'Left room: ' + currentRoomId);
+                debugLog(`Left room: ${currentRoomId}`, 'ROOM');
+                showMessage('System', `Left room: ${currentRoomId}`);
                 currentRoomId = null;
                 if (stompClient) {
                     stompClient.disconnect();
                     stompClient = null;
+                    debugLog('Disconnected from WebSocket', 'WEBSOCKET');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                debugLog('Error leaving room: ' + error);
+                debugLog(`Error leaving room: ${error}`, 'ERROR');
             });
     }
 
@@ -208,7 +226,7 @@
             return;
         }
 
-        debugLog('Starting game...');
+        debugLog('Starting game...', 'GAME');
         let request = {
             roomId: currentRoomId,
             sender: currentNickname,
@@ -224,33 +242,35 @@
         })
             .then(response => response.json())
             .then(data => {
-                debugLog('Game start requested');
+                debugLog('Game start requested', 'GAME');
                 showMessage('System', 'Game start requested');
             })
             .catch(error => {
                 console.error('Error:', error);
-                debugLog('Error starting game: ' + error);
-                showMessage('System', 'Error starting game: ' + error.message);
+                debugLog(`Error starting game: ${error}`, 'ERROR');
+                showMessage('System', `Error starting game: ${error.message}`);
             });
     }
 
     function connectToRoom(roomId) {
         if (stompClient) {
             stompClient.disconnect();
+            debugLog('Disconnecting previous WebSocket connection', 'WEBSOCKET');
         }
 
-        debugLog('Connecting to WebSocket...');
+        debugLog(`Connecting to WebSocket for room: ${roomId}`, 'WEBSOCKET');
         let socket = new SockJS('/omg');
         stompClient = Stomp.over(socket);
         stompClient.debug = function (str) {
-            debugLog('STOMP: ' + str);
+            debugLog(`STOMP: ${str}`, 'WEBSOCKET');
         };
         stompClient.connect({}, function (frame) {
-            debugLog('Connected to room WebSocket: ' + frame);
+            debugLog(`Connected to room WebSocket: ${frame}`, 'WEBSOCKET');
             showMessage('System', 'Connected to room WebSocket');
-            stompClient.subscribe('/topic/room/' + roomId, function (response) {
-                debugLog('Received message: ' + response.body);
+            stompClient.subscribe(`/topic/room/${roomId}`, function (response) {
+                debugLog(`Received message in room ${roomId}: ${response.body}`, 'WEBSOCKET');
                 let message = JSON.parse(response.body);
+                debugLog(`Received message in room ${roomId}: ${response.body}`, 'WEBSOCKET');
                 if (message.message === 'GAME_START') {
                     showMessage('System', 'Game started!');
                 } else {
@@ -258,7 +278,7 @@
                 }
             });
         }, function (error) {
-            debugLog('Error connecting to WebSocket: ' + error);
+            debugLog(`Error connecting to WebSocket: ${error}`, 'ERROR');
             console.error('STOMP error:', error);
         });
     }
@@ -275,8 +295,8 @@
             return;
         }
 
-        debugLog('Sending message: ' + message);
-        stompClient.send("/pub/room/" + currentRoomId, {}, JSON.stringify({
+        debugLog(`Sending message in room ${currentRoomId}: ${message}`, 'CHAT');
+        stompClient.send(`/pub/room/${currentRoomId}`, {}, JSON.stringify({
             roomId: currentRoomId,
             sender: currentNickname,
             message: message
@@ -286,7 +306,7 @@
     }
 
     function showMessage(sender, message) {
-        debugLog('Showing message: ' + sender + ': ' + message);
+        debugLog(`Showing message: ${sender}: ${message}`, 'CHAT');
         let messageHistory = document.getElementById('messageHistory');
         let messageElement = document.createElement('div');
         messageElement.className = 'message';

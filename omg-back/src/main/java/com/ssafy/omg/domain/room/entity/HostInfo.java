@@ -1,4 +1,4 @@
-package com.ssafy.omg.domain.room.dto;
+package com.ssafy.omg.domain.room.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
