@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     echo '********** Backend Build Start **********'
-                    dir('backend') {
+                    dir('omg-back') {
                         sh 'docker build -t docker-image/$BACKEND_IMAGE .'
                     }
                     
