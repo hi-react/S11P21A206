@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/games")
@@ -28,7 +29,10 @@ public class GameController {
     public void initializeGame(@Payload CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
         RoomInfo roomInfo = roomService.getRoomInfo(roomId);
-        List<String> players = roomInfo.getInRoomPlayers();
+        List<String> players = roomInfo.getInRoomPlayers()
+                .keySet()
+                .stream()
+                .collect(Collectors.toList());
 
         GameInfo gameInfo = gameService.initializeGame(roomId, players);
 
