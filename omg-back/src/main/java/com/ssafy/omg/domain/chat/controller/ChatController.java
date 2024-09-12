@@ -13,8 +13,8 @@ public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/rooms/{roodId}")
+    @MessageMapping("/rooms/{roomId}")
     public void chat(@DestinationVariable String roomId, ChatMessage chatMessage) {
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomId, chatMessage);
+        messagingTemplate.convertAndSend("/sub/rooms/" + roomId, chatMessage);
     }
 }
