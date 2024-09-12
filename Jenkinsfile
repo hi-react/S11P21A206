@@ -41,7 +41,7 @@ pipeline {
         //             echo '********** Frontend Build End **********'
         //         }
         //     }
-        }
+        // }
 
         // stage('Deploy Frontend Static Files') {
         //     steps {
