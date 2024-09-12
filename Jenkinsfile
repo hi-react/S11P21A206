@@ -66,18 +66,18 @@ pipeline {
         //     }
         // }
 
-        stage('Delete unnecessary Docker images') {
-            steps {
-                script {
-                    echo '********** Delete unnecessary Docker images Start **********'
-                    
-                    sh 'docker image prune -a -f'
-                    
-                    echo '********** Delete unnecessary Docker images End **********'
-                }
-            }
-        }
-    }
+//         stage('Delete unnecessary Docker images') {
+//             steps {
+//                 script {
+//                     echo '********** Delete unnecessary Docker images Start **********'
+//
+//                     sh 'docker image prune -a -f'
+//
+//                     echo '********** Delete unnecessary Docker images End **********'
+//                 }
+//             }
+//         }
+//     }
 
     // post {
     //     success {
