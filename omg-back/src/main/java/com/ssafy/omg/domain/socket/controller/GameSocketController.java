@@ -1,7 +1,7 @@
 package com.ssafy.omg.domain.socket.controller;
 
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
-import com.ssafy.omg.domain.socket.service.RoomSocketServiceImpl;
+import com.ssafy.omg.domain.socket.service.GameSocketServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class RoomSocketController {
+public class GameSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoomSocketServiceImpl roomSocketService;
+    private final GameSocketServiceImpl roomSocketService;
 
     @MessageMapping("/room.modify")
     public void roomModify(@Payload CommonRoomRequest request) {

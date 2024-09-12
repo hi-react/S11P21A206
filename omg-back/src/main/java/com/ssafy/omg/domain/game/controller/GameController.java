@@ -5,7 +5,7 @@ import com.ssafy.omg.domain.game.dto.GameInfo;
 import com.ssafy.omg.domain.game.service.GameService;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
-import com.ssafy.omg.domain.room.entity.RoomInfo;
+import com.ssafy.omg.domain.room.entity.Room;
 import com.ssafy.omg.domain.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -27,7 +27,7 @@ public class GameController {
     @MessageMapping("/init")
     public void initializeGame(@Payload CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
-        RoomInfo roomInfo = roomService.getRoomInfo(roomId);
+        Room roomInfo = roomService.getRoomInfo(roomId);
         List<String> players = roomInfo.getInRoomPlayers();
 
         GameInfo gameInfo = gameService.initializeGame(roomId, players);

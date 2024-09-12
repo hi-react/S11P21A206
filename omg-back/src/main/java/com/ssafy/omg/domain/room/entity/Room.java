@@ -12,9 +12,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomInfo implements Serializable {
+public class Room implements Serializable {
     private String roomId;
-    private HostInfo host;
+    private String hostNickname;
     private List<String> inRoomPlayers;
     private int renderedCount;
 }
