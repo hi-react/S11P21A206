@@ -13,13 +13,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RoomInfo implements Serializable {
+public class Room implements Serializable {
     private String roomId;
     private String hostNickname;
     @JsonProperty("inRoomPlayers")
     private List<InRoomPlayer> inRoomPlayers;
 
-    public RoomInfo(String roomId, String hostNickname) {
+    public Room(String roomId, String hostNickname) {
         this.roomId = roomId;
         this.hostNickname = hostNickname;
         this.inRoomPlayers = new ArrayList<>();
