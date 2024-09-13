@@ -37,8 +37,10 @@ pipeline {
             steps {
                 script {
                     echo '******** Docker Compose Start ************'
-                    sh 'docker compose down'
-                    sh 'docker compose up -d'
+                    sh 'docker compose down'  // 기존 컨테이너를 모두 중지 및 제거
+                    sh 'docker rm -f frontend || true'  // 이미 존재하는 컨테이너가 있다면 강제로 삭제
+                    sh 'docker rm -f backend || true'
+                    sh 'docker compose up -d'  // 새로운 컨테이너 실행
                     echo '********** Docker Compose End ***********'
                 }
             }
