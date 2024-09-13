@@ -54,17 +54,17 @@ pipeline {
         //     }
         // }
 
-        // stage('Docker Compose Up') {
-        //     steps {
-        //         script {
-        //             echo '******** Docker Compose Start ************'
-        //             sh 'docker compose down'
-        //             sh 'docker compose up -d'
+        stage('Docker Compose Up') {
+            steps {
+                script {
+                    echo '******** Docker Compose Start ************'
+                    sh 'docker compose down'
+                    sh 'docker compose up -d'
                     
-        //             echo '********** Docker Compose End ***********'
-        //         }
-        //     }
-        // }
+                    echo '********** Docker Compose End ***********'
+                }
+            }
+        }
 
 //         stage('Delete unnecessary Docker images') {
 //             steps {
