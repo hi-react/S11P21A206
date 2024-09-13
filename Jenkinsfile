@@ -7,15 +7,6 @@ pipeline {
     }
 
     stages {
-        // stage('Git Checkout') {
-        //     steps {
-        //         // GitLab에서 코드를 체크아웃
-        //         git branch: 'develop',
-        //         credentialsId: 'junsk50',
-        //         url: 'https://lab.ssafy.com/s11-fintech-finance-sub1/S11P21A206.git'
-        //     }
-        // }
-
         stage('Backend Build') {
             steps {
                 script {
@@ -23,7 +14,6 @@ pipeline {
                     dir('omg-back') {
                         sh 'docker build -t docker-image/$BACKEND_IMAGE .'
                     }
-                    
                     echo '********** Backend Build End **********'
                 }
             }
@@ -34,9 +24,10 @@ pipeline {
                 script {
                     echo '********** Frontend Build Start **********'
                     dir('omg-front') {
-                        sh 'docker build -t docker-image/$FRONTEND_IMAGE .'
+                        sh 'pwd'  // 현재 디렉토리 출력
+                        sh 'ls -al'  // 디렉토리 내 파일 목록 확인
+                        sh 'docker build --no-cache -t docker-image/$FRONTEND_IMAGE .'
                     }
-
                     echo '********** Frontend Build End **********'
                 }
             }
@@ -48,28 +39,15 @@ pipeline {
                     echo '******** Docker Compose Start ************'
                     sh 'docker compose down'
                     sh 'docker compose up -d'
-                    
                     echo '********** Docker Compose End ***********'
                 }
             }
         }
-
-//         stage('Delete unnecessary Docker images') {
-//             steps {
-//                 script {
-//                     echo '********** Delete unnecessary Docker images Start **********'
-//
-//                     sh 'docker image prune -a -f'
-//
-//                     echo '********** Delete unnecessary Docker images End **********'
-//                 }
-//             }
-//         }
     }
 
     post {
         success {
-        	script {
+            script {
                 def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
                 def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
                 mattermostSend (color: 'good',
@@ -80,7 +58,7 @@ pipeline {
             }
         }
         failure {
-        	script {
+            script {
                 def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
                 def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
                 mattermostSend (color: 'danger',
