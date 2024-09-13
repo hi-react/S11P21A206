@@ -31,7 +31,7 @@ public class GameController {
         RoomInfo roomInfo = roomService.getRoomInfo(roomId);
         List<String> players = roomInfo.getInRoomPlayers()
                 .stream()
-                .flatMap(map -> map.keySet().stream())
+                .map(player -> player.getNickname())
                 .collect(Collectors.toList());
 
         GameInfo gameInfo = gameService.initializeGame(roomId, players);
