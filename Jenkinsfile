@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         BACKEND_IMAGE = 'backend'
-        FRONTEND_BUILD_DIR = 'frontend/dist'  // Assuming your build directory is 'dist' after npm build
+        FRONTEND_IMAGE = 'frontend'
     }
 
     stages {
@@ -29,30 +29,18 @@ pipeline {
             }
         }
 
-        // stage('Frontend Build') {
-        //     steps {
-        //         script {
-        //             echo '********** Frontend Build Start **********'
-        //             dir('frontend') {
-        //                 sh 'npm install'  // Install dependencies
-        //                 sh 'npm run build'  // Build static files
-        //             }
+        stage('Frontend Build') {
+            steps {
+                script {
+                    echo '********** Frontend Build Start **********'
+                    dir('omg-front') {
+                        sh 'docker build -t docker-image/$FRONTEND_IMAGE .'
+                    }
 
-        //             echo '********** Frontend Build End **********'
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy Frontend Static Files') {
-        //     steps {
-        //         script {
-        //             echo '********** Deploy Frontend Static Files Start **********'
-        //             // Copy built frontend files to /var/www/html for Nginx
-        //             sh 'sudo cp -r frontend/dist/* /var/www/html/'
-        //             echo '********** Deploy Frontend Static Files End **********'
-        //         }
-        //     }
-        // }
+                    echo '********** Frontend Build End **********'
+                }
+            }
+        }
 
         stage('Docker Compose Up') {
             steps {
