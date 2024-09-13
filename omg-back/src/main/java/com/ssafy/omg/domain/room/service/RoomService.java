@@ -3,7 +3,7 @@ package com.ssafy.omg.domain.room.service;
 import com.ssafy.omg.config.baseresponse.BaseException;
 import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
-import com.ssafy.omg.domain.room.dto.RoomInfo;
+import com.ssafy.omg.domain.room.entity.RoomInfo;
 
 public interface RoomService {
 
@@ -33,4 +33,7 @@ public interface RoomService {
 
     // 방 정보 반환
     RoomInfo getRoomInfo(String roomId) throws BaseException;
+
+    // 방 정보 업데이트
+    void updateRoom(RoomInfo room) throws BaseException;
 }

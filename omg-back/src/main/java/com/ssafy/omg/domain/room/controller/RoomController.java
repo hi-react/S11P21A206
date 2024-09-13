@@ -6,10 +6,12 @@ import com.ssafy.omg.domain.room.dto.CommonRoomRequest;
 import com.ssafy.omg.domain.room.dto.CommonRoomResponse;
 import com.ssafy.omg.domain.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.reactor.ReactorProperties;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
@@ -32,8 +34,9 @@ public class RoomController {
      */
     @PostMapping("/create")
     public BaseResponse<String> createRoom(@RequestParam String userNickname) throws BaseException {
-        userNickname = "test1";
+//        userNickname = "test1";
         String roomId = roomService.createRoom(userNickname);
+        log.info("Room created: {}, User: {}", roomId, userNickname);
         return new BaseResponse<>(roomId);
     }
 
@@ -47,10 +50,13 @@ public class RoomController {
     @PostMapping("/enter")
     public BaseResponse<CommonRoomResponse> enterRoom(@RequestBody CommonRoomRequest request) throws BaseException {
         CommonRoomResponse response = roomService.enterRoom(request);
+        log.info("User {} entered room {}", request.getSender(), request.getRoomId());
         return new BaseResponse<>(response);
     }
 
     /**
+     * 대기방 나가기
+     *
      * @param request
      * @return response
      * @throws BaseException
@@ -75,6 +81,8 @@ public class RoomController {
     }
 
     /**
+     * 게임 시작 버튼 클릭
+     *
      * @param request
      * @return response
      * @throws BaseException
@@ -82,7 +90,7 @@ public class RoomController {
     @PostMapping("/start")
     public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
         CommonRoomResponse response = roomService.clickStartButton(request);
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId(),
+        messagingTemplate.convertAndSend("/sub/game/" + request.getRoomId(),
                 new CommonRoomResponse(request.getRoomId(), "GAME_START", null, response.getRoomInfo()));
         return new BaseResponse<>(response);
     }
