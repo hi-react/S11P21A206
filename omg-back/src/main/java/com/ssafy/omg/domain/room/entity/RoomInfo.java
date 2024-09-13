@@ -3,7 +3,9 @@ package com.ssafy.omg.domain.room.entity;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -13,29 +15,40 @@ import java.util.Map;
 public class RoomInfo implements Serializable {
     private String roomId;
     private String hostNickname;
-    private Map<String, Boolean> inRoomPlayers;
+    private List<Map<String, Boolean>> inRoomPlayers;
 
     public RoomInfo(String roomId, String hostNickname) {
         this.roomId = roomId;
         this.hostNickname = hostNickname;
-        this.inRoomPlayers = new HashMap<>();
-        this.inRoomPlayers.put(hostNickname, false);
+        this.inRoomPlayers = new ArrayList<>();
+        addPlayer(hostNickname);
     }
 
     public void addPlayer(String nickname) {
-        this.inRoomPlayers.put(nickname, false);
+        Map<String, Boolean> player = new HashMap<>();
+        player.put(nickname, false);
+        this.inRoomPlayers.add(player);
     }
 
     public void removePlayer(String nickname) {
-        this.inRoomPlayers.remove(nickname);
+        this.inRoomPlayers.removeIf(player -> player.containsKey(nickname));
     }
 
     public void setPlayerRendered(String nickname, boolean isRendered) {
-        this.inRoomPlayers.put(nickname, isRendered);
+        for (Map<String, Boolean> player : inRoomPlayers) {
+            if (player.containsKey(nickname)) {
+                player.put(nickname, isRendered);
+            }
+        }
     }
 
     public boolean isAllRendered() {
-        return !this.inRoomPlayers.containsValue(false);
+        for (Map<String, Boolean> player : inRoomPlayers) {
+            if (player.containsValue(false)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int getPlayerCount() {

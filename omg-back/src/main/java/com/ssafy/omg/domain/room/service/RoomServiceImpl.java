@@ -116,7 +116,8 @@ public class RoomServiceImpl implements RoomService {
             throw new BaseException(ROOM_FULLED_ERROR);
         }
 
-        boolean isNewPlayer = !roomInfo.getInRoomPlayers().containsKey(sender);
+        boolean isNewPlayer = roomInfo.getInRoomPlayers().stream()
+                .noneMatch(player -> player.containsKey(sender));
         if (isNewPlayer) {
             roomInfo.addPlayer(sender);
             generalInfo.setRoomInfo(roomInfo);
@@ -162,7 +163,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         // 대기방에 존재하지 않는 사람일 경우 예외처리
-        if (!roomInfo.getInRoomPlayers().containsKey(sender)) {
+        if (roomInfo.getInRoomPlayers().stream().noneMatch(player -> player.containsKey(sender))) {
             throw new BaseException(USER_NOT_IN_ROOM);
         }
 
@@ -172,7 +173,7 @@ public class RoomServiceImpl implements RoomService {
             redisTemplate.delete(roomKey);
             return new CommonRoomResponse(roomId, "ROOM_DELETED", null, null);
         } else if (sender.equals(roomInfo.getHostNickname())) {
-            String newHost = roomInfo.getInRoomPlayers().keySet().iterator().next();
+            String newHost = roomInfo.getInRoomPlayers().get(0).keySet().iterator().next();
             roomInfo.setHostNickname(newHost);
         }
 

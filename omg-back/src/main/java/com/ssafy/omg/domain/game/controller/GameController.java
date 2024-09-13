@@ -30,13 +30,13 @@ public class GameController {
         String roomId = request.getRoomId();
         RoomInfo roomInfo = roomService.getRoomInfo(roomId);
         List<String> players = roomInfo.getInRoomPlayers()
-                .keySet()
                 .stream()
+                .flatMap(map -> map.keySet().stream())
                 .collect(Collectors.toList());
 
         GameInfo gameInfo = gameService.initializeGame(roomId, players);
 
-        messagingTemplate.convertAndSend("/topic/game/" + roomId,
+        messagingTemplate.convertAndSend("/pub/game/" + roomId,
                 new CommonRoomResponse(roomId, "GAME_INITIALIZED", gameInfo, null));
     }
 }
