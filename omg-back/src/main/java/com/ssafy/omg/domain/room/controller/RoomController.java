@@ -81,7 +81,7 @@ public class RoomController {
     }
 
     /**
-     * 게임 시작 버튼 클릭
+     * 게임 시작 버튼 클릭으로 게임 시작
      *
      * @param request
      * @return response
@@ -90,8 +90,11 @@ public class RoomController {
     @PostMapping("/start")
     public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
         CommonRoomResponse response = roomService.clickStartButton(request);
-        messagingTemplate.convertAndSend("/sub/game/" + request.getRoomId(),
+
+        // WebSocket을 통해 게임 시작 메시지를 브로드캐스트
+        messagingTemplate.convertAndSend("/sub/" + request.getRoomId() + "/game",
                 new CommonRoomResponse(request.getRoomId(), "GAME_START", null, response.getRoomInfo()));
+
         return new BaseResponse<>(response);
     }
 }
