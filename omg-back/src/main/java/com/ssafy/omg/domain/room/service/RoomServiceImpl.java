@@ -337,6 +337,7 @@ public class RoomServiceImpl implements RoomService {
 
     /**
      * 모든 플레이어 렌더링여부 확인
+     * 메소드 레퍼런스로 InRoomPlayer객체의 isRendered 호출
      *
      * @param room 확인할 방 정보
      * @return 모든 플레이어가 렌더링을 완료했으면 true, 그렇지 않으면 false
