@@ -203,7 +203,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     /**
-     * 사용자 렌더 완료
+     * 각 사용자 렌더 완료 표시
      *
      * @param request
      * @return
