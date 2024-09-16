@@ -29,7 +29,7 @@ public interface RoomService {
     CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException;
 
     // 모든 사용자 렌더 완료 여부
-    CommonRoomResponse checkAllRenderedCompleted(CommonRoomRequest request) throws BaseException;
+    CommonRoomResponse checkAllRenderedCompleted(String roomId) throws BaseException;
 
     // 방 정보 반환
     Room getRoom(String roomId) throws BaseException;

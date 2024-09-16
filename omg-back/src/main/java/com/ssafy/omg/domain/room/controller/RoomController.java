@@ -81,6 +81,30 @@ public class RoomController {
     }
 
     /**
+     * 특정 사용자 렌더링 완료
+     *
+     * @param request 특정 사용자 렌더링 완료
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/render-complete")
+    public BaseResponse<CommonRoomResponse> handleRenderedComplete(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.handleRenderedComplete(request);
+        return new BaseResponse<>(response);
+    }
+
+    /**
+     * @param roomId 모든 사용자 렌더링 상태 확인할 방 번호
+     * @return response
+     * @throws BaseException
+     */
+    @GetMapping("/{roomId}")
+    public BaseResponse<CommonRoomResponse> checkAllRenderedCompleted(@PathVariable String roomId) throws BaseException {
+        CommonRoomResponse response = roomService.checkAllRenderedCompleted(roomId);
+        return new BaseResponse<>(response);
+    }
+
+    /**
      * 게임 시작 버튼 클릭으로 게임 시작
      *
      * @param request

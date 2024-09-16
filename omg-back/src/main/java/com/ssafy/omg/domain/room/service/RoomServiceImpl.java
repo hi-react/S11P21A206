@@ -231,21 +231,20 @@ public class RoomServiceImpl implements RoomService {
     /**
      * 모든 사용자 렌더 완료 여부
      *
-     * @param request
+     * @param roomId
      * @return
      * @throws BaseException
      */
     @Override
-    public CommonRoomResponse checkAllRenderedCompleted(CommonRoomRequest request) throws BaseException {
-        String roomKey = ROOM_PREFIX + request.getRoomId();
-        String roodId = request.getRoomId();
+    public CommonRoomResponse checkAllRenderedCompleted(String roomId) throws BaseException {
+        String roomKey = ROOM_PREFIX + roomId;
         Arena arena = getArena(roomKey);
 
         Room room = arena.getRoom();
         if (isAllRendered(room)) {
             arena.setMessage("RENDER_COMPLETE_ACCEPTED");
             redisTemplate.opsForValue().set(roomKey, arena, 1, TimeUnit.HOURS);
-            return new CommonRoomResponse(roodId, "RENDER_COMPLETE_ACCEPTED", null, room);
+            return new CommonRoomResponse(roomId, "RENDER_COMPLETE_ACCEPTED", null, room);
         } else {
             throw new BaseException(RENDER_NOT_COMPLETED);
         }
