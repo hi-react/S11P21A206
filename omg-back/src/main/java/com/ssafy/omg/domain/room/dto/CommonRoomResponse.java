@@ -15,5 +15,5 @@ public class CommonRoomResponse {
     private String roomId;
     private String message;
     private GameInfo gameInfo;
-    private Room roomInfo;
+    private Room room;
 }

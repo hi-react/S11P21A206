@@ -28,7 +28,7 @@ public class GameController {
     @MessageMapping("/init")
     public void initializeGame(@Payload CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
-        Room roomInfo = roomService.getRoomInfo(roomId);
+        Room roomInfo = roomService.getRoom(roomId);
         List<String> players = roomInfo.getInRoomPlayers()
                 .stream()
                 .map(player -> player.getNickname())

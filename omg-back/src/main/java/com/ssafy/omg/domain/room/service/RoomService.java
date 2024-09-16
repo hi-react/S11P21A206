@@ -32,7 +32,7 @@ public interface RoomService {
     CommonRoomResponse checkAllRenderedCompleted(CommonRoomRequest request) throws BaseException;
 
     // 방 정보 반환
-    Room getRoomInfo(String roomId) throws BaseException;
+    Room getRoom(String roomId) throws BaseException;
 
     // 방 정보 업데이트
     void updateRoom(Room room) throws BaseException;
