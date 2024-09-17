@@ -229,6 +229,14 @@ public class RoomServiceImpl implements RoomService {
         return new CommonRoomResponse(roomId, sender, "RENDERED_COMPLETE", null, room);
     }
 
+    @Override
+    public boolean isAllRenderedCompleted(String roomId) throws BaseException {
+        String roomKey = ROOM_PREFIX + roomId;
+        Arena arena = getArena(roomKey);
+        Room room = arena.getRoom();
+        return isAllRendered(room);
+    }
+
     /**
      * 모든 사용자 렌더 완료 여부
      *

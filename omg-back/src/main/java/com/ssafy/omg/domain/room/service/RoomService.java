@@ -28,6 +28,9 @@ public interface RoomService {
     // 사용자 렌더 완료
     CommonRoomResponse handleRenderedComplete(CommonRoomRequest request) throws BaseException;
 
+    // 모든 사용자 렌더 완료 여부 (boolean 반환)
+    boolean isAllRenderedCompleted(String roomId) throws BaseException;
+
     // 모든 사용자 렌더 완료 여부
     CommonRoomResponse checkAllRenderedCompleted(String roomId) throws BaseException;
 

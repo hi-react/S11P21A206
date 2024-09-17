@@ -43,10 +43,30 @@ public class RoomMessageController {
             case "LEAVE_ROOM":
                 response = roomService.leaveRoom(request);
                 updatedRoom = response.getRoom();
-                log.info("{} 가 {}에서 퇴장했습니다.", sender, roomId);
+                log.info("유저 {} 가 {} 방에서 퇴장했습니다.", sender, roomId);
                 break;
+
+            case "START_BUTTON_CLICKED":
+                response = roomService.clickStartButton(request);
+                updatedRoom = response.getRoom();
+                log.info("{} 방에서 게임 시작 버튼이 클릭되었습니다.", roomId);
+                break;
+
+            case "RENDERED_COMPLETE":
+                response = roomService.handleRenderedComplete(request);
+                updatedRoom = response.getRoom();
+                log.info("유저 {}의 렌더링이 완료되었습니다.", sender);
+
+                // 모든 플레이어의 렌더링이 완료되었는지 확인
+                if (roomService.isAllRenderedCompleted(roomId)) {
+                    CommonRoomResponse allRenderedResponse = new CommonRoomResponse(roomId, "SYSTEM", "ALL_RENDERED_COMPLETED", null, updatedRoom);
+                    messagingTemplate.convertAndSend("/sub/" + roomId + "/room", allRenderedResponse);
+                    log.info("{} 방의 모든 플레이어 렌더링이 완료되었습니다.", roomId);
+                }
+                break;
+
             default:
-                log.warn("{}에 일치하는 메시지 타입이 없습니다.", message);
+                log.warn("{} 에 일치하는 메시지 타입이 없습니다.", message);
                 return;
         }
 
