@@ -45,7 +45,7 @@ public class WebSocketEventListener {
             logger.info("연결 해제 : " + userNickname);
             try {
                 CommonRoomResponse response = roomService.leaveRoom(new CommonRoomRequest(roomId, userNickname, "LEAVE_GAME"));
-                messagingTemplate.convertAndSend("/topic/game/" + roomId, response);
+                messagingTemplate.convertAndSend("/sub/" + roomId + "/game", response);
             } catch (BaseException e) {
                 logger.error("Error processing user disconnect: ", e);
             }
