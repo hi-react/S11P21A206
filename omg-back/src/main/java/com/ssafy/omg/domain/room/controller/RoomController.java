@@ -117,7 +117,7 @@ public class RoomController {
 
         // WebSocket을 통해 게임 시작 메시지를 브로드캐스트
         messagingTemplate.convertAndSend("/sub/" + request.getRoomId() + "/game",
-                new CommonRoomResponse(request.getRoomId(), "GAME_START", null, response.getRoom()));
+                new CommonRoomResponse(request.getRoomId(), request.getSender(), "GAME_START", null, response.getRoom()));
 
         return new BaseResponse<>(response);
     }

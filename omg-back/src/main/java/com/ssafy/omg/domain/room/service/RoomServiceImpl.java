@@ -120,7 +120,7 @@ public class RoomServiceImpl implements RoomService {
             throw new BaseException(ALREADY_ENTERED_ERROR);
         }
 
-        return new CommonRoomResponse(roomId, "ENTER_SUCCESS", null, room);
+        return new CommonRoomResponse(roomId, sender, "ENTER_SUCCESS", null, room);
     }
 
     /**
@@ -156,7 +156,7 @@ public class RoomServiceImpl implements RoomService {
 
         if (getPlayerCount(room) == 0) {
             redisTemplate.delete(roomKey);
-            return new CommonRoomResponse(roomId, "ROOM_DELETED", null, null);
+            return new CommonRoomResponse(roomId, sender, "ROOM_DELETED", null, null);
         } else if (sender.equals(room.getHostNickname())) {
             String newHost = room.getInRoomPlayers().get(0).getNickname();
             room.setHostNickname(newHost);
@@ -165,7 +165,7 @@ public class RoomServiceImpl implements RoomService {
         arena.setRoom(room);
         arena.setMessage("LEAVE_ROOM");
         redisTemplate.opsForValue().set(roomKey, arena, 1, TimeUnit.HOURS);
-        return new CommonRoomResponse(roomId, "LEAVE_ROOM", null, room);
+        return new CommonRoomResponse(roomId, sender, "LEAVE_ROOM", null, room);
     }
 
     /**
@@ -195,11 +195,12 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public CommonRoomResponse clickStartButton(CommonRoomRequest request) throws BaseException {
         String roomId = request.getRoomId();
+        String sender = request.getSender();
         if (!isStartButtonActive(request)) {
             throw new BaseException(INSUFFICIENT_PLAYER_ERROR);
         }
         Room room = getRoom(roomId);
-        return new CommonRoomResponse(roomId, "START_BUTTON_CLICKED", null, room);
+        return new CommonRoomResponse(roomId, sender, "START_BUTTON_CLICKED", null, room);
     }
 
     /**
@@ -225,7 +226,7 @@ public class RoomServiceImpl implements RoomService {
         arena.setMessage(sender + " RENDERED_COMPLETE");
         redisTemplate.opsForValue().set(roomKey, arena, 1, TimeUnit.HOURS);
 
-        return new CommonRoomResponse(roomId, "RENDERED_COMPLETE", null, room);
+        return new CommonRoomResponse(roomId, sender, "RENDERED_COMPLETE", null, room);
     }
 
     /**
@@ -244,7 +245,7 @@ public class RoomServiceImpl implements RoomService {
         if (isAllRendered(room)) {
             arena.setMessage("RENDER_COMPLETE_ACCEPTED");
             redisTemplate.opsForValue().set(roomKey, arena, 1, TimeUnit.HOURS);
-            return new CommonRoomResponse(roomId, "RENDER_COMPLETE_ACCEPTED", null, room);
+            return new CommonRoomResponse(roomId, "GAME_MANAGER", "RENDER_COMPLETE_ACCEPTED", null, room);
         } else {
             throw new BaseException(RENDER_NOT_COMPLETED);
         }
