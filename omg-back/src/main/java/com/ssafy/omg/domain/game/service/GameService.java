@@ -2,7 +2,7 @@ package com.ssafy.omg.domain.game.service;
 
 import com.ssafy.omg.domain.game.dto.CommonUserActionRequest;
 import com.ssafy.omg.domain.game.dto.GameInfo;
-import com.ssafy.omg.domain.game.dto.PlayerInfo;
+import com.ssafy.omg.domain.player.dto.PlayerInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
