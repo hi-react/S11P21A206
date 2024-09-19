@@ -2,6 +2,9 @@ import Modal from 'react-modal';
 import { Route, Routes } from 'react-router-dom';
 
 import loadable from '@loadable/component';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 Modal.setAppElement('#root');
 
@@ -20,11 +23,13 @@ const Game = loadable(() => import('@/pages/Game'), {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path='/' element={<Login />}></Route>
-      <Route path='/lobby' element={<Lobby />}></Route>
-      <Route path='/waiting' element={<Waiting />}></Route>
-      <Route path='/game' element={<Game />}></Route>
-    </Routes>
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route path='/' element={<Login />}></Route>
+        <Route path='/lobby' element={<Lobby />}></Route>
+        <Route path='/waiting' element={<Waiting />}></Route>
+        <Route path='/game' element={<Game />}></Route>
+      </Routes>
+    </QueryClientProvider>
   );
 }
