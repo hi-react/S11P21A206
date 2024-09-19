@@ -18,5 +18,5 @@ public class Arena implements Serializable {
     private String roomId;
     private String message;
     private Game game;
-    private Room roomInfo;
+    private Room room;
 }

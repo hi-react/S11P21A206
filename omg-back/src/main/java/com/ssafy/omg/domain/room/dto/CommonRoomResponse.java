@@ -1,6 +1,6 @@
 package com.ssafy.omg.domain.room.dto;
 
-import com.ssafy.omg.domain.game.dto.GameInfo;
+import com.ssafy.omg.domain.game.entity.Game;
 import com.ssafy.omg.domain.room.entity.Room;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommonRoomResponse {
     private String roomId;
+    private String sender;
     private String message;
-    private GameInfo gameInfo;
-    private Room roomInfo;
+    private Game game;
+    private Room room;
 }

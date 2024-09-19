@@ -3,7 +3,6 @@ package com.ssafy.omg.domain.chat.controller;
 import com.ssafy.omg.domain.chat.dto.ChatMessage;
 import com.ssafy.omg.domain.socket.dto.StompPayload;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -20,8 +19,9 @@ public class ChatController {
 //        messagingTemplate.convertAndSend("/sub/rooms/" + roomId, chatMessage);
 //    }
 
-    @MessageMapping("/chat/{roomId}")
+    @MessageMapping("/{roomId}/chat")
     public void chat(@Payload StompPayload<ChatMessage> chatMessage) {
-        messagingTemplate.convertAndSend("/sub/rooms/" + chatMessage.getRoomId(), chatMessage);
+//        System.out.println("Received message: " + chatMessage); // 로그 찍어보기
+        messagingTemplate.convertAndSend("/sub/" + chatMessage.getRoomId() + "/chat", chatMessage);
     }
 }

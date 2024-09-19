@@ -81,7 +81,31 @@ public class RoomController {
     }
 
     /**
-     * 게임 시작 버튼 클릭
+     * 특정 사용자 렌더링 완료
+     *
+     * @param request 특정 사용자 렌더링 완료
+     * @return response
+     * @throws BaseException
+     */
+    @PostMapping("/render-complete")
+    public BaseResponse<CommonRoomResponse> handleRenderedComplete(@RequestBody CommonRoomRequest request) throws BaseException {
+        CommonRoomResponse response = roomService.handleRenderedComplete(request);
+        return new BaseResponse<>(response);
+    }
+
+    /**
+     * @param roomId 모든 사용자 렌더링 상태 확인할 방 번호
+     * @return response
+     * @throws BaseException
+     */
+    @GetMapping("/{roomId}")
+    public BaseResponse<CommonRoomResponse> checkAllRenderedCompleted(@PathVariable String roomId) throws BaseException {
+        CommonRoomResponse response = roomService.checkAllRenderedCompleted(roomId);
+        return new BaseResponse<>(response);
+    }
+
+    /**
+     * 게임 시작 버튼 클릭으로 게임 시작
      *
      * @param request
      * @return response
@@ -90,8 +114,11 @@ public class RoomController {
     @PostMapping("/start")
     public BaseResponse<Object> clickStartButton(@RequestBody CommonRoomRequest request) throws BaseException {
         CommonRoomResponse response = roomService.clickStartButton(request);
-        messagingTemplate.convertAndSend("/sub/game/" + request.getRoomId(),
-                new CommonRoomResponse(request.getRoomId(), "GAME_START", null, response.getRoomInfo()));
+
+        // WebSocket을 통해 게임 시작 메시지를 브로드캐스트
+        messagingTemplate.convertAndSend("/sub/" + request.getRoomId() + "/game",
+                new CommonRoomResponse(request.getRoomId(), request.getSender(), "GAME_START", null, response.getRoom()));
+
         return new BaseResponse<>(response);
     }
 }
