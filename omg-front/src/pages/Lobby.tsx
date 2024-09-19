@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '@/apis/errorHandler';
 import { createWaitingRooms, enterWaitingRoom } from '@/apis/room/roomAPI';
 import ExitButton from '@/components/ExitButton';
+import { useRoomStore } from '@/stores/room';
 import { AxiosError } from 'axios';
 
 export default function Lobby() {
   const navigate = useNavigate();
+  const { setRoomId, setSender } = useRoomStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string>('');
@@ -19,7 +21,7 @@ export default function Lobby() {
     setError(null);
     try {
       // TODO: test로 넣어놓은 것 로그인 연동하면 바꿔야 함
-      const response = await createWaitingRooms('test17');
+      const response = await createWaitingRooms('test3');
       setRoomCode(response);
     } catch (err) {
       const handledError = handleApiError(err as AxiosError);
@@ -51,8 +53,10 @@ export default function Lobby() {
   const handleClickEnterRoom = async () => {
     // TODO: 에러처리 필요
     try {
-      const response = await enterWaitingRoom(roomCode, 'test17');
+      const response = await enterWaitingRoom(roomCode, 'test30');
       if (response.success) {
+        setRoomId(response.roomId);
+        setSender('test30');
         console.log(`입력된 방코드: ${response.roomId}`);
         navigate('/waiting');
       } else {
