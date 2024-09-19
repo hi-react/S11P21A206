@@ -51,6 +51,9 @@ public enum BaseResponseStatus {
     USER_NOT_IN_ROOM(false, 3026, "대기방에서 유저를 찾을 수 없습니다."),
     RENDER_NOT_COMPLETED(false, 3027, "모든 유저의 렌더가 완료되지 않았습니다."),
 
+    // game
+    ARENA_NOT_FOUND(false, 3031, "아레나가 존재하지 않습니다."),
+
     // 3101 ~~ 3199 : 이가은
     GAME_NOT_FOUND(false, 3101, "게임이 존재하지 않습니다."),
     PLAYER_NOT_FOUND(false, 3102, "플레이어가 존재하지 않습니다."),
