@@ -8,6 +8,8 @@ package com.ssafy.omg.domain.player.entity;
 
 public class Player {
 
+    private String nickname;
+
     private double[] position;            // 플레이어 좌표(x, y, z)
     private double[] direction;         // 플레이어 방향
 
