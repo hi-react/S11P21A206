@@ -1,18 +1,17 @@
 package com.ssafy.omg.domain.game.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.ssafy.omg.domain.game.entity.ActionStatus;
+import com.ssafy.omg.domain.player.entity.Player;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserActionResponse {
-	private String gameId;
-	private String message;
-	private Action action;
-	private GameSimpleInfo game;
+	private String roomId;
+	private ActionStatus message;
+	private Player player;
 	private String reason;
 }

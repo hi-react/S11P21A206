@@ -2,11 +2,13 @@ package com.ssafy.omg.domain.game.service;
 
 import com.ssafy.omg.config.baseresponse.BaseException;
 import com.ssafy.omg.domain.arena.entity.Arena;
+import com.ssafy.omg.domain.game.dto.UserActionResponse;
 import com.ssafy.omg.domain.game.entity.Game;
 import com.ssafy.omg.domain.game.entity.GameStatus;
 import com.ssafy.omg.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.ssafy.omg.config.baseresponse.BaseResponseStatus.*;
+import static com.ssafy.omg.domain.game.entity.ActionStatus.ACTION_SUCCESS;
 import static com.ssafy.omg.domain.player.entity.PlayerStatus.NOT_STARTED;
 
 @Service
@@ -21,6 +24,7 @@ import static com.ssafy.omg.domain.player.entity.PlayerStatus.NOT_STARTED;
 public class GameServiceImpl implements GameService {
 
 	private final RedisTemplate<String, Arena> redisTemplate;
+	private final SimpMessagingTemplate messagingTemplate;
 	// Redis에서 대기방 식별을 위한 접두사 ROOM_PREFIX 설정
 	private static final String ROOM_PREFIX = "room";
 	private final int[][] LOAN_RANGE = new int[][]{{50, 100}, {150, 300}, {500, 1000}};
@@ -199,7 +203,12 @@ public class GameServiceImpl implements GameService {
 
 		savePlayer(roomKey, arena, player);
 
-		
+		// UserActionResponse 보내기
+		UserActionResponse response = UserActionResponse.builder()
+				.roomId(roomId)
+				.message(ACTION_SUCCESS)
+				.player(player).build();
+		messagingTemplate.convertAndSend("/sub/" + roomId + "/game", response);
 	}
 
 	// 상환
