@@ -10,14 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserActionRequest {
-	private String roomId;
-	private String sender;
-	private Details details;
+    private String roomId;
+    private String sender;
+    private Details details;
 
-	@Getter
-	@Setter
-	public static class Details {
-		private int stockId;
-		private int amount;
-	}
+    @Getter
+    @Setter
+    public static class Details {
+        private int stockId;
+        private int amount;
+    }
 }

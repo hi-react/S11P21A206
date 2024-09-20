@@ -10,8 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserActionResponse {
-	private String roomId;
-	private ActionStatus message;
-	private Player player;
-	private String reason;
+    private String roomId;
+    private ActionStatus message;
+    private Player player;
+    private String reason;
 }

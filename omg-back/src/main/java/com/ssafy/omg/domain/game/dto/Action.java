@@ -7,13 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Action {
-	private PlayerAction type;
-	private ActionInfo details;
+    private PlayerAction type;
+    private ActionInfo details;
 
-	@Getter
-	@Setter
-	public static class ActionInfo {
-		private Integer stockId;
-		private int amount;
-	}
+    @Getter
+    @Setter
+    public static class ActionInfo {
+        private Integer stockId;
+        private int amount;
+    }
 }
