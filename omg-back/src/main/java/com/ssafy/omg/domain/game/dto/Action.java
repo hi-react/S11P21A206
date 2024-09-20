@@ -6,7 +6,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ActionInfo {
+public class Action {
 	private PlayerAction type;
-	private ActionDetailInfo details;
+	private ActionInfo details;
+
+	@Getter
+	@Setter
+	public static class ActionInfo {
+		private Integer stockId;
+		private int amount;
+	}
 }

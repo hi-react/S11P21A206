@@ -9,10 +9,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonUserActionRequest {
-	private String gameId;
+public class UserActionRequest {
+	private String roomId;
 	private String sender;
-	private int senderIdx;
-	private String message;
-	private ActionInfo action;
+	private Details details;
+
+	@Getter
+	@Setter
+	public static class Details {
+		private int stockId;
+		private int amount;
+	}
 }

@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonUserActionResponse {
+public class UserActionResponse {
 	private String gameId;
 	private String message;
-	private ActionInfo action;
+	private Action action;
 	private GameSimpleInfo game;
 	private String reason;
 }

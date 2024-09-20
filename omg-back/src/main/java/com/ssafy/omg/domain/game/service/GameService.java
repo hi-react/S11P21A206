@@ -6,10 +6,12 @@ import com.ssafy.omg.domain.arena.entity.Arena;
 import java.util.List;
 
 public interface GameService {
-    // 게임 초기값 세팅
-    Arena initializeGame(String roomId, List<String> inRoomPlayers) throws BaseException;
+	// 게임 초기값 세팅
+	Arena initializeGame(String roomId, List<String> inRoomPlayers) throws BaseException;
 
-    int preLoan(String roomId, String sender) throws BaseException;
+	int preLoan(String roomId, String sender) throws BaseException;
 
-    void takeLoan(String roomId, String sender, int amount) throws BaseException;
+	void takeLoan(String roomId, String sender, int amount) throws BaseException;
+
+	void repayLoan(String roomId, String sender, int amount) throws BaseException;
 }
