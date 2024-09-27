@@ -2,18 +2,18 @@ import { useFloatingObject } from '@/hooks/useFloatingObject';
 import { useGLTF } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 
-interface SocksProps {
+interface CaneProps {
   onClick: (event: ThreeEvent<PointerEvent>) => void;
   disabled: boolean;
 }
 
-export default function Socks({ onClick, disabled }: SocksProps) {
-  const { scene } = useGLTF('/models/socks/socks.gltf');
+export default function Cane({ onClick, disabled }: CaneProps) {
+  const { scene } = useGLTF('/models/cane/cane.gltf');
 
   const position = {
-    x: 2,
-    y: 0,
-    z: -2.3,
+    x: 3,
+    y: 0.8,
+    z: -1.3,
   };
 
   const ref = useFloatingObject(position.y);
